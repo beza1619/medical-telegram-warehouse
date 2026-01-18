@@ -1,0 +1,37 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+.venv/
+
+# Data
+data/raw/images/
+*.db
+*.session
+*.log
+
+# Secrets
+.env
+*.env
+secrets/
+
+# Notebooks
+.ipynb_checkpoints/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# dbt
+medical_warehouse/target/
+medical_warehouse/dbt_packages/

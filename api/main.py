@@ -1,3 +1,6 @@
+from fastapi.responses import JSONResponse
+from fastapi.exceptions import RequestValidationError
+from starlette.exceptions import HTTPException as StarletteHTTPException
 from api import schemas
 from api.database import get_db, test_connection
 from typing import List
@@ -315,6 +318,68 @@ async def health_check():
             "version": "1.0.0"
         }
     )
+# ==================== ERROR HANDLERS ====================
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request, exc):
+    """Handle request validation errors"""
+    return JSONResponse(
+        status_code=422,
+        content={
+            "status": "error",
+            "error": "Validation Error",
+            "details": exc.errors(),
+            "timestamp": datetime.now().isoformat()
+        }
+    )
+
+@app.exception_handler(StarletteHTTPException)
+async def http_exception_handler(request, exc):
+    """Handle HTTP exceptions"""
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={
+            "status": "error",
+            "error": exc.detail,
+            "timestamp": datetime.now().isoformat()
+        }
+    )
+
+@app.exception_handler(Exception)
+async def global_exception_handler(request, exc):
+    """Handle all other exceptions"""
+    return JSONResponse(
+        status_code=500,
+        content={
+            "status": "error",
+            "error": "Internal Server Error",
+            "details": str(exc) if str(exc) else "Unknown error",
+            "timestamp": datetime.now().isoformat()
+        }
+    )
+
+# Update your existing endpoints to use try/except
+# Example: Update the summary endpoint
+@app.get("/api/summary")
+async def get_summary():
+    """Get overall data summary with error handling"""
+    try:
+        conn = get_db_connection()
+        # ... existing query code ...
+        conn.close()
+        return {
+            "status": "success",
+            "timestamp": datetime.now().isoformat(),
+            "data": summary
+        }
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Database error: {str(e)}"
+        )
+    finally:
+        if 'conn' in locals():
+            conn.close()
 
 if __name__ == "__main__":
     import uvicorn

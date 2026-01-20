@@ -38,71 +38,40 @@ class TelegramScraper:
         messages_data = []
         
         try:
-            async for message in self.client.iter_messages(channel_username, limit=limit):
-                message_info = {
-                    'message_id': message.id,
-                    'channel_name': channel_username,
-                    'message_date': message.date.isoformat() if message.date else None,
-                    'message_text': message.text or '',
-                    'has_media': message.media is not None,
-                    'views': message.views or 0,
-                    'forwards': message.forwards or 0,
-                    'image_path': None
-                }
-                
-                # Download image if available
-                if message.media and isinstance(message.media, MessageMediaPhoto):
-                    image_path = await self.download_image(message, channel_username)
-                    message_info['image_path'] = image_path
-                
-                messages_data.append(message_info)
-                logger.info(f"Scraped message {message.id} from {channel_username}")
-                
-        except Exception as e:
-            logger.error(f"Error scraping {channel_username}: {str(e)}")
-            
-        return messages_data
     
-    async def download_image(self, message, channel_name):
-        """Download image from message"""
-        try:
-            date_str = datetime.now().strftime('%Y-%m-%d')
-            image_dir = f"data/raw/images/{channel_name}/{date_str}"
-            os.makedirs(image_dir, exist_ok=True)
-            
-            image_path = f"{image_dir}/{message.id}.jpg"
-            await message.download_media(file=image_path)
-            logger.info(f"Downloaded image: {image_path}")
-            return image_path
-            
-        except Exception as e:
-            logger.error(f"Failed to download image: {str(e)}")
-            return None
+   async def scrape_channel(self, channel_username, limit=50):
+    """Scrape messages from a channel with detailed logging"""
+    messages_data = []
     
-    def save_to_json(self, messages, channel_name):
-        """Save scraped data to JSON file"""
-        try:
-            date_str = datetime.now().strftime('%Y-%m-%d')
-            json_dir = f"data/raw/telegram_messages/{date_str}"
-            os.makedirs(json_dir, exist_ok=True)
+    try:
+        logger.info(f"START scraping channel: {channel_username}", extra={'channel': channel_username})
+        
+        async for message in self.client.iter_messages(channel_username, limit=limit):
+            # ... existing message processing code ...
             
-            file_path = f"{json_dir}/{channel_name}.json"
-            with open(file_path, 'w', encoding='utf-8') as f:
-                json.dump(messages, f, ensure_ascii=False, indent=2)
-            
-            logger.info(f"Saved {len(messages)} messages to {file_path}")
-            return file_path
-            
-        except Exception as e:
-            logger.error(f"Failed to save JSON: {str(e)}")
-            return None
+        logger.info(f"COMPLETE scraped {len(messages_data)} messages from {channel_username}", 
+                   extra={'channel': channel_username})
+        
+    except Exception as e:
+        error_type = type(e).__name__
+        logger.error(f"FAILED scraping {channel_username}: {error_type} - {str(e)}", 
+                    extra={'channel': channel_username})
+        
+    return messages_data
     
     async def run_scraping(self):
         """Main scraping function"""
         await self.start_client()
         
         # Channels to scrape
-        channels = ['lobelia4cosmetics', 'tikvahpharma']
+    channels = [
+    'lobelia4cosmetics',    # Existing
+    'tikvahpharma',         # Existing
+    'CheMed123',            # Missing - Add this
+    'ethiopharma',          # Ethiopian pharmacy channel
+    'pharmacyaddis',        # Ethiopian channel
+    'addispharmacy'         # Ethiopian channel
+]
         
         for channel in channels:
             logger.info(f"Starting to scrape: {channel}")

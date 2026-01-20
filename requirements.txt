@@ -1,0 +1,45 @@
+# Telegram Scraping
+telethon==1.34.0
+python-dotenv==1.0.0
+
+# Data Processing & Database
+pandas==2.1.0
+sqlalchemy==2.0.23
+psycopg2-binary==2.9.9  # For PostgreSQL
+# For SQLite (built into Python)
+
+# Data Transformation (dbt)
+dbt-core==1.7.0
+dbt-postgres==1.7.0  # If using PostgreSQL
+# dbt-sqlite can be added if available
+
+# Computer Vision (YOLO)
+ultralytics==8.1.0
+opencv-python==4.12.0.88
+torch==2.9.1
+torchvision==0.24.1
+
+# API Framework
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+pydantic==2.5.0
+
+# Data Analysis & Visualization
+jupyter==1.0.0
+matplotlib==3.10.7
+seaborn==0.13.2
+numpy==2.1.0
+
+# Pipeline Orchestration
+dagster==1.5.0
+dagster-webserver==1.5.0
+
+# Testing & Development
+pytest==7.4.0
+black==23.11.0
+flake8==6.1.0
+
+# Utilities
+requests==2.31.0
+python-dateutil==2.8.2
+tzdata==2023.3  # For timezone support

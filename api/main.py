@@ -1,3 +1,6 @@
+from api import schemas
+from api.database import get_db, test_connection
+from typing import List
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.responses import HTMLResponse
 import sqlite3
@@ -300,6 +303,18 @@ async def visual_content_stats():
         "analysis": "Image usage and engagement comparison",
         "channels": df.to_dict(orient='records')
     }
+@app.get("/health", response_model=schemas.APIResponse)
+async def health_check():
+    """Health check endpoint"""
+    return schemas.APIResponse(
+        status="success",
+        message="Medical Telegram Analytics API is running",
+        data={
+            "api_status": "running",
+            "endpoints": 6,
+            "version": "1.0.0"
+        }
+    )
 
 if __name__ == "__main__":
     import uvicorn
